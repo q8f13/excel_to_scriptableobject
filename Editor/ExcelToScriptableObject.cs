@@ -166,14 +166,15 @@ namespace GreatClock.Common.ExcelToSO {
 				content.AppendLine(string.Format("{0}\t{1}", indent, serializeAttribute));
 				content.AppendLine(string.Format("{0}\tprivate {1}[] _{1}Items;", indent, sheet.itemClassName));
 				if (settings.use_public_items_getter) {
-					content.AppendLine(string.Format("{0}\tpublic int Get{1}Items(List<{1}> items) {{", indent, sheet.itemClassName));
-					content.AppendLine(string.Format("{0}\t\tint len = _{1}Items.Length;", indent, sheet.itemClassName));
-					content.AppendLine(string.Format("{0}\t\tfor (int i = 0; i < len; i++) {{", indent));
-					content.AppendLine(string.Format("{0}\t\t\titems.Add(_{1}Items[i].Init(mVersion, DataGetterObject{2}));",
-						indent, sheet.itemClassName, hashStringKey ? ", false" : ""));
-					content.AppendLine(string.Format("{0}\t\t}}", indent));
-					content.AppendLine(string.Format("{0}\t\treturn len;", indent));
-					content.AppendLine(string.Format("{0}\t}}", indent));
+					content.AppendLine(string.Format("{0}\tpublic {1}[] Get{1}Items() => _{1}Items;", indent, sheet.itemClassName));
+					// content.AppendLine(string.Format("{0}\tpublic int Get{1}Items(List<{1}> items) {{", indent, sheet.itemClassName));
+					// content.AppendLine(string.Format("{0}\t\tint len = _{1}Items.Length;", indent, sheet.itemClassName));
+					// content.AppendLine(string.Format("{0}\t\tfor (int i = 0; i < len; i++) {{", indent));
+					// content.AppendLine(string.Format("{0}\t\t\titems.Add(_{1}Items[i].Init(mVersion, DataGetterObject{2}));",
+					// 	indent, sheet.itemClassName, hashStringKey ? ", false" : ""));
+					// content.AppendLine(string.Format("{0}\t\t}}", indent));
+					// content.AppendLine(string.Format("{0}\t\treturn len;", indent));
+					// content.AppendLine(string.Format("{0}\t}}", indent));
 				}
 				content.AppendLine();
 				string idVarName = firstField.fieldName;
