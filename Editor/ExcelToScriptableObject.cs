@@ -73,6 +73,7 @@ namespace GreatClock.Common.ExcelToSO {
 			public bool compress_color_into_int;
 			public bool treat_unknown_types_as_enum;
 			public bool generate_tostring_method;
+			public string use_existing_class;
 		}
 
 		[Serializable]
@@ -404,6 +405,7 @@ namespace GreatClock.Common.ExcelToSO {
 			content.AppendLine();
 
 			foreach (SheetData sheet in sheets) {
+
 				content.AppendLine(string.Format("{0}[Serializable]", indent));
 				content.AppendLine(string.Format("{0}public class {1} {{", indent, sheet.itemClassName));
 				content.AppendLine();
@@ -1889,6 +1891,10 @@ namespace GreatClock.Common.ExcelToSO {
 				pos.y += pos.height + EditorGUIUtility.standardVerticalSpacing;
 				mSetting.generate_tostring_method = EditorGUI.ToggleLeft(pos, "Generate ToString Method", mSetting.generate_tostring_method);
 				pos.y += pos.height + EditorGUIUtility.standardVerticalSpacing;
+				string class_tip = string.IsNullOrEmpty(mSetting.use_existing_class) ? "Use Other Existing Class" : string.Format("=>{0}<=",mSetting.use_existing_class);
+				mSetting.tmp_obj = EditorGUI.ObjectField(pos, class_tip, mSetting.tmp_obj, typeof(ScriptableObject));
+				mSetting.use_existing_class = mSetting.tmp_obj == null ? "" : mSetting.tmp_obj.name;
+				pos.y += pos.height + EditorGUIUtility.standardVerticalSpacing;
 				pos.x = rect.x;
 				pos.width = rect.width;
 				pos.height = mSlavesList.GetHeight();
@@ -2275,6 +2281,8 @@ namespace GreatClock.Common.ExcelToSO {
 			}
 			if (mToProcess.to_generate_code.Count > 0) {
 				for (int i = 0, imax = mToProcess.to_generate_code.Count; i < imax; i++) {
+					if(!string.IsNullOrEmpty(mToProcess.to_generate_code[i].use_existing_class))
+						continue;
 					GenerateCode(mToProcess.to_generate_code[i]);
 				}
 				mToProcess.to_generate_code.Clear();
@@ -2336,6 +2344,7 @@ namespace GreatClock.Common.ExcelToSO {
 			ret.compress_color_into_int = setting.compress_color_into_int;
 			ret.treat_unknown_types_as_enum = setting.treat_unknown_types_as_enum;
 			ret.generate_tostring_method = setting.generate_tostring_method;
+			ret.use_existing_class = setting.use_existing_class;
 			return ret;
 		}
 
@@ -2344,7 +2353,10 @@ namespace GreatClock.Common.ExcelToSO {
 			string className = Path.GetFileNameWithoutExtension(setting.excel_name);
 			ret.excel_path = setting.excel_name;
 			ret.asset_directory = setting.asset_directory;
-			ret.class_name = string.IsNullOrEmpty(setting.name_space) ? className : (setting.name_space + "." + className);
+			if(string.IsNullOrEmpty(setting.use_existing_class))
+				ret.class_name = string.IsNullOrEmpty(setting.name_space) ? className : (setting.name_space + "." + className);
+			else
+				ret.class_name = setting.use_existing_class;
 			ret.use_hash_string = setting.use_hash_string;
 			ret.compress_color_into_int = setting.compress_color_into_int;
 			ret.treat_unknown_types_as_enum = setting.treat_unknown_types_as_enum;
@@ -2498,6 +2510,8 @@ namespace GreatClock.Common.ExcelToSO {
 		public bool compress_color_into_int = true;
 		public bool treat_unknown_types_as_enum = false;
 		public bool generate_tostring_method = true;
+		public string use_existing_class;
+		public UnityEngine.Object tmp_obj;
 		public ExcelToScriptableObjectSlave[] slaves;
 	}
 
